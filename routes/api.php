@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::group(
+    [
+        'middleware' => 'api',
+        'namespace'  => 'App\Http\Controllers\api',
+    ],
+    function () {
+        Route::get('Expert/systemUpsertPairData', 'ExpertAPI@systemUpsertPairData');
+        Route::get('Expert/systemUpsertIndicatorData', 'ExpertAPI@systemUpsertIndicatorData');
+    }
+);
