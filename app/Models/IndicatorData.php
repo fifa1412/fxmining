@@ -18,7 +18,7 @@ class IndicatorData extends Eloquent
         'symbol',
         'timeframe',
         'value',
+        'updated_at',
     ];
-    public $timestamps = true;
 
 }

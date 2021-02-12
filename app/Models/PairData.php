@@ -14,11 +14,8 @@ class PairData extends Eloquent
     protected $collection = 'pair_data';
     protected $fillable = [
         'symbol',
-        'price_ask', 
-        'price_bid',
-        'swap_long',
-        'swap_short',
+        'value',
+        'updated_at',
     ];
-    public $timestamps = true;
 
 }

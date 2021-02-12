@@ -20,7 +20,7 @@ Route::group(
         'namespace'  => 'App\Http\Controllers\api',
     ],
     function () {
-        Route::get('Expert/systemUpsertPairData', 'ExpertAPI@systemUpsertPairData');
-        Route::get('Expert/systemUpsertIndicatorData', 'ExpertAPI@systemUpsertIndicatorData');
+        Route::post('Expert/systemUpsertPairData', 'ExpertAPI@systemUpsertPairData');
+        Route::post('Expert/systemUpsertIndicatorData', 'ExpertAPI@systemUpsertIndicatorData');
     }
 );
