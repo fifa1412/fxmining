@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Exception;
 use App\Models\PairData;
 use App\Models\IndicatorData;
+use App\Models\ActiveOrder;
 use Carbon\Carbon;
 
 /*
@@ -56,6 +57,26 @@ class ExpertAPI extends Controller
             }
             IndicatorData::truncate();
             IndicatorData::insert($ind_data_list);
+            return 200;
+        }catch (Exception $e) {
+            return 500;
+        }
+    }
+
+    public function systemInsertActiveOrderList(Request $request)
+    {
+        try{
+            $active_order_list_tmp = json_decode($request->total_params,true);
+            $active_order_list = array();
+            foreach($active_order_list_tmp as $active_order){
+                $active_order_list[] = array(
+                    'ticket' => $active_order['ticket'],
+                    'value' => $active_order['value'],
+                    'updated_at'=> Carbon::now()->toIso8601String(),
+                );
+            }
+            ActiveOrder::truncate();
+            ActiveOrder::insert($active_order_list);
             return 200;
         }catch (Exception $e) {
             return 500;

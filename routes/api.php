@@ -22,5 +22,10 @@ Route::group(
     function () {
         Route::post('Expert/systemUpsertPairData', 'ExpertAPI@systemUpsertPairData');
         Route::post('Expert/systemUpsertIndicatorData', 'ExpertAPI@systemUpsertIndicatorData');
+        Route::post('Expert/systemInsertActiveOrderList', 'ExpertAPI@systemInsertActiveOrderList');
+        
+        Route::post('Dashboard/userGetPairData', 'DashboardAPI@userGetPairData');
+        Route::post('Dashboard/userGetIndicatorData', 'DashboardAPI@userGetIndicatorData');
+        Route::post('Dashboard/userGetActiveOrder', 'DashboardAPI@userGetActiveOrder');
     }
 );
