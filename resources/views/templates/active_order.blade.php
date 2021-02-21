@@ -1,4 +1,3 @@
-@include('header')
 <script type="text/javascript" src="{{ asset('js/templates/active_order.js') }}"></script>
 <div class="container" style="padding-top:50px">
 
@@ -22,5 +21,3 @@
   
 
 </div>
-
-@include('footer')

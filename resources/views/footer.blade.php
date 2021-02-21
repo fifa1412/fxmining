@@ -162,6 +162,15 @@
     font-weight:600
   }
 }
+footer {
+    position: fixed;
+    height: 50px;
+    background-color: red;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-bottom: 0px;
+}
   </style>
   
   <!-- Site footer -->
@@ -175,7 +184,7 @@
 
         <div class="col-md-4 col-sm-6 col-xs-12">
           <ul class="social-icons">
-            <li><a class="facebook" href="https://www.facebook.com/pkonez"><i class="fa fa-facebook"></i></a></li>
+            {{-- <li><a class="facebook" href="https://www.facebook.com/pkonez"><i class="fa fa-facebook"></i></a></li> --}}
           </ul>
         </div>
       </div>

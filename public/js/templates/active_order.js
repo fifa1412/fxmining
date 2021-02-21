@@ -1,14 +1,12 @@
 var ActiveOrder = {};
 
-const BASE_URL = "//" + window.location.host;
-
 $(document).ready(function() {
     ActiveOrder.refreshActiveOrder();
 });
 
 setInterval(function(){ 
     ActiveOrder.refreshActiveOrder();
-}, 5000*10000);
+}, 5000);
 
 ActiveOrder.refreshActiveOrder = function(){
     $.ajax({
@@ -17,7 +15,6 @@ ActiveOrder.refreshActiveOrder = function(){
         success: function (response) {
             if(response.status.code == 200){
                 let html = "";
-                console.log(response.data);
                 response.data.active_order.forEach(function(active_order) {
                         html += `<tr class="${ActiveOrder.getRowColor(active_order.value.profit)}">
                                     <th scope="row">${active_order.ticket}</th>

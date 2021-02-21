@@ -1,9 +1,7 @@
 var Dashboard = {};
 
-const BASE_URL = "//" + window.location.host;
-let first_run = true;
-
 $(document).ready(function() {
+    Root.showPopup("Loading...");
     Dashboard.refreshPairData();
 });
 
@@ -18,29 +16,61 @@ Dashboard.refreshPairData = function(){
         success: function (response) {
             if(response.status.code == 200){
                 let html = "";
+                let updated_time = "";
+                let date_obj = "";
                 response.data.pair_data.forEach(function(pair) {
-                        let adr_20 = Math.round((pair.value.today_adr/pair.value.adr_20)*100);
-                        html += `<tr>
-                                    <th scope="row">${pair.symbol}</th>
+                        let today_adr_percent = Math.round((pair.value.today_adr/pair.value.adr_20)*100);
+                        updated_time = pair.updated_at;
+                        html += `<tr valign="middle">
+                                    <td scope="row">${pair.symbol}</td>
                                     <td>${Math.round(pair.value.today_adr)}</td>
-                                    <td style="color:${Dashboard.getADRPercentColor(adr_20)}">${adr_20}%</td>
+                                    <td>${Dashboard.getADRProgressBar(today_adr_percent)}</td>
                                     <td>${Math.round(pair.value.adr_20)}</td>
-                                    <td id="${pair.symbol}_price_bid" style="color:${Dashboard.getPriceColor(pair.symbol,'bid',pair.value.price_bid)}">
+                                    <td id="${pair.symbol}_price_bid" style="color:${Root.getPriceColor(pair.symbol,'price_bid',pair.value.price_bid)}">
                                         ${pair.value.price_bid}</td>
-                                    <td id="${pair.symbol}_price_ask" style="color:${Dashboard.getPriceColor(pair.symbol,'ask',pair.value.price_ask)}">
+                                    <td id="${pair.symbol}_price_ask" style="color:${Root.getPriceColor(pair.symbol,'price_ask',pair.value.price_ask)}">
                                         ${pair.value.price_ask}</td>
                                     <td style="color:${Dashboard.getSwapColor(pair.value.swap_long)}">${pair.value.swap_long}</td>
                                     <td style="color:${Dashboard.getSwapColor(pair.value.swap_short)}">${pair.value.swap_short}</td>
                                     <td>${pair.value.spread}</td>
                                     <td>${Dashboard.getMarketStatus(pair.value.trade_allowed)}</td>
-                                    <td>${pair.updated_at}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-sm">Buy</button>
+                                        <button type="button" class="btn btn-danger btn-sm">Sell</button>
+                                    </td>
                                 </tr>`
                 });
                 $('#pair_data_tbody').html(html);
-                first_run = false;
+                date_obj = new Date(Date.parse(updated_time));
+                $('#updated_time').html(`Updated Time: ${Root.formatDatetime(date_obj)}`);
+                if(is_first_run==true){
+                    $('#dashboard_table').show();
+                    $('#status_table').show();
+                    is_first_run = false;
+                    Root.closePopup();
+                }
             }
         }
     });
+}
+
+Dashboard.getADRProgressBar = function(percent){
+    if(percent < 75){
+        bg_color = "bg-success";
+    }else if(percent<91){
+        bg_color = "bg-warning";
+    }else{
+        bg_color = "bg-danger";
+    }
+
+    if(percent <= 100){
+        progress = percent;
+    }else{
+        progress = 100;
+    }
+    return `<div class="progress" style="height:30px;">
+                <div class="progress-bar ${bg_color}" role="progressbar" style="height:30px; width: ${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">${percent}%</div>
+            </div>`;
 }
 
 Dashboard.getSwapColor = function(swap){
@@ -68,17 +98,4 @@ Dashboard.getADRPercentColor = function(adr){
         return "red";
     }
 
-}
-
-Dashboard.getPriceColor = function(pair,price_type,current_price){
-    if(first_run == false){
-        let previous_price = document.getElementById(pair+"_price_"+price_type).innerText;
-        if(previous_price > current_price){
-            return "red";
-        }else if(previous_price == current_price){
-            return $('#'+pair+"_price_"+price_type).css("color");
-        }else{
-            return "lime";
-        }
-    }
 }

@@ -8,7 +8,7 @@ use Exception;
 use App\Models\PairData;
 use App\Models\IndicatorData;
 use App\Models\ActiveOrder;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class DashboardAPI extends Controller
 {
@@ -43,7 +43,19 @@ class DashboardAPI extends Controller
     {    
         $response_data = array();
         try {
-            $response_data['indicator_data'] = IndicatorData::get();
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'timeframe'         => 'required|string',
+                ]
+            ); 
+          
+            if ($validator->fails()) {
+                throw new Exception($validator->errors()->first(), SAFE_EXCEPTION_CODE);
+            }
+
+            $response_data['symbol_data'] = PairData::get();
+            $response_data['indicator_data'] = IndicatorData::where('timeframe',$request->timeframe)->get();
             
             return response()->json([
                 'status'  =>  array_merge(APIController::getResponseStatus(HTTP_STATUS_SUCCESS , __CLASS__ , __FUNCTION__),
