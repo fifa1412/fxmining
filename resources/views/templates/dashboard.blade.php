@@ -17,7 +17,7 @@
         <th scope="col" colspan=2>Swap</th>
         <th scope="col" rowspan=2>Spread</th>
         <th scope="col" rowspan=2>Market<br>Status</th>
-        <th scope="col" rowspan=2>Execute Order</th>
+        <th scope="col" rowspan=2>Order<br>Execution</th>
       </tr>
       <tr>
         {{-- Average Daily Range --}}

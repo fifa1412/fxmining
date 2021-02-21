@@ -1,8 +1,9 @@
 var AllPairTrade = {};
 
-let timeframe = 'H1';
+let timeframe = '';
 let indicator_data_list = [];
 let symbol_data_list = [];
+let timeframe_list = ['M1','M5','M15','M30','H1','H4','D1','W1','MN'];
 let table_header = `  
     <tr class="table-dark">
         <th scope="col" rowspan=2>Symbol</th>
@@ -12,7 +13,7 @@ let table_header = `
         <th scope="col" colspan=2>Stochastic</th>
         <th scope="col" colspan=5>Moving Average</th>
         <th scope="col" rowspan=2>Weight</th>
-        <th scope="col" rowspan=2>Execute Order</th>
+        <th scope="col" rowspan=2>Order<br>Execution</th>
     </tr>
     <tr class="table-dark">
         <th style="color:aqua;">Main</th>
@@ -41,14 +42,36 @@ let indicator_setting_list = [
     {'indicator_name' : 'MA','indicator_settings' : {'period':'200','apply_to':'PRICE_CLOSE','method':'MODE_SMA'},'value' : 'main_value','decimal':null},
 ];
 
-$(document).ready(function() {
-    Root.showPopup("Loading...");
-    AllPairTrade.refreshIndicatorData();
+$(document).ready(async function() {
+    AllPairTrade.generateTimeframeTab();
+    await AllPairTrade.changeTimeFrame('H1');
 });
 
 setInterval(function(){ 
     AllPairTrade.refreshIndicatorData();
-}, 5000000);
+}, 5000);
+
+AllPairTrade.generateTimeframeTab = function(){
+    let timeframe_tab_html = '';
+    timeframe_list.forEach(function(timeframe) {
+        timeframe_tab_html += `<li class="nav-item"><a class="nav-link cursor-pointer" style="color:white;" id="TF_TAB_${timeframe}" onclick="AllPairTrade.changeTimeFrame('${timeframe}')">${timeframe}</a></li>`;
+    });
+    $('#timeframe_tab').html(timeframe_tab_html);
+}
+
+AllPairTrade.changeTimeFrame = async function(tf){
+    return new Promise((resolve)=>{
+        is_first_run = true;
+        Root.showPopup("Loading...");
+        timeframe = tf;
+        $(`a[id^='TF_TAB']`).css("color", "white");
+        $(`a[id^='TF_TAB']`).removeClass('active');
+        $(`#TF_TAB_${tf}`).css("color", "black");
+        $(`#TF_TAB_${tf}`).addClass('active');
+        AllPairTrade.refreshIndicatorData();
+        resolve();
+    });
+}
 
 AllPairTrade.refreshIndicatorData = function(){
     $.ajax({
@@ -60,16 +83,29 @@ AllPairTrade.refreshIndicatorData = function(){
         success: function (response) {
             if(response.status.code == 200){
                 let symbol_list = [];
-                
+                let trade_not_allow_count = 0;
+
                 // Get Symbol Data //
                 symbol_data_list = response.data.symbol_data;
                 symbol_data_list.forEach(function(symbol_data) {
+                    if(symbol_data.value.trade_allowed == "false"){
+                        trade_not_allow_count++;
+                    }
                     symbol_data_list[symbol_data.symbol] = symbol_data.value;       
                      // Push Unique Symbol To Array //
-                     if(symbol_list.indexOf(symbol_data.symbol) === -1){
+                    if(symbol_list.indexOf(symbol_data.symbol) === -1){
                         symbol_list.push(symbol_data.symbol);
                     }
                 });
+
+                // Set Status Panel //
+                $('#server_name').text(response.data.symbol_data[0]['value']['server_name']);
+                $('#server_time').text(response.data.symbol_data[0]['value']['server_time']);
+                if(trade_not_allow_count==symbol_data_list.length){
+                    $('#server_status').html('<a style="color:red">(Close)</a>');
+                }else{
+                    $('#server_status').html('<a style="color:lime">(Open)</a>');
+                }
                 
                 // Write Indicator Data //
                 indicator_data_list = response.data.indicator_data;

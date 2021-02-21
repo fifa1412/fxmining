@@ -13,6 +13,12 @@
     <link rel="icon" href="{{asset('images/logo.png')}}">
 </head>
 
+<style>
+    .cursor-pointer{
+        cursor: pointer;
+    }
+</style>
+
 <!-- Navbar Content -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
