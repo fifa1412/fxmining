@@ -3,8 +3,8 @@
 
 <table class="table table-bordered table-active">
     <thead class="thead">
-      <tr bgcol>
-        <th scope="col">Ticket No</th>
+      <tr class="table-dark">
+        <th scope="col">Order No</th>
         <th scope="col">Type</th>
         <th scope="col">Lot</th>
         <th scope="col">Symbol</th>
