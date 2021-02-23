@@ -23,9 +23,13 @@ Route::group(
         Route::post('Expert/systemUpsertPairData', 'ExpertAPI@systemUpsertPairData');
         Route::post('Expert/systemUpsertIndicatorData', 'ExpertAPI@systemUpsertIndicatorData');
         Route::post('Expert/systemInsertActiveOrderList', 'ExpertAPI@systemInsertActiveOrderList');
+        Route::post('Expert/systemUpdateOrderStatus', 'ExpertAPI@systemUpdateOrderStatus');
+        Route::post('Expert/systemGetRequestOrderList', 'ExpertAPI@systemGetRequestOrderList');
         
         Route::post('Dashboard/userGetPairData', 'DashboardAPI@userGetPairData');
         Route::post('Dashboard/userGetIndicatorData', 'DashboardAPI@userGetIndicatorData');
         Route::post('Dashboard/userGetActiveOrder', 'DashboardAPI@userGetActiveOrder');
+
+        Route::post('Order/userExecuteOrder', 'OrderAPI@userExecuteOrder');
     }
 );

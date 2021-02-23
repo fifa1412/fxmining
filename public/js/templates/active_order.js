@@ -1,6 +1,7 @@
 var ActiveOrder = {};
 
 $(document).ready(function() {
+    Root.showPopup("Loading...");
     ActiveOrder.refreshActiveOrder();
 });
 
@@ -38,6 +39,11 @@ ActiveOrder.refreshActiveOrder = function(){
                             <th scope="row">${parseFloat(total_profit).toFixed(2)}</th>
                         </tr> `;
                 $('#active_order_tbody').html(html);
+
+                if(is_first_run == true){
+                    is_first_run = false;
+                    Root.closePopup();
+                }
             }
         }
     });

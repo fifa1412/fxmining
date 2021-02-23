@@ -3,7 +3,7 @@
 <table id="status_table" class="table table-borderless " style="text-align: center; color: white; display:none;">
     <thead>
       <tr>
-        <th scope="col">Server Name: XM-Global Demo-4</th>
+        <th scope="col" id="server_name"></th>
         <th scope="col" id="updated_time"></th>
       </tr>
     </thead>

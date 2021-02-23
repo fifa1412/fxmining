@@ -9,6 +9,9 @@
             <tr class="table-dark">
                 <th scope="col">Server&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;<img src="{{ asset('images/broker-logo/xm.png') }}" width="40px">&nbsp;&nbsp;&nbsp;<a id="server_name"></a></th>
                 <th scope="col">Market Watch&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;<a id="server_time"></a> <a id="server_status"></a></th>
+                <th scope="col">Random Code&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;<a id="random_code"></a>&nbsp;&nbsp;&nbsp;
+                    <i class="fas fa-redo cursor-pointer" style="color:yellow;" onclick="AllPairTrade.refreshRandomStr();" aria-hidden="true"></i>
+                </th>
             </tr>
         </tbody>
     </table>

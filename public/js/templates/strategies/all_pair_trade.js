@@ -2,7 +2,12 @@ var AllPairTrade = {};
 
 let timeframe = '';
 let indicator_data_list = [];
+let previous_symbol_data_list = [];
+let is_already_click_buy_btn = [];
+let is_already_click_sell_btn = [];
 let symbol_data_list = [];
+let lot = 0.01;
+let order_group_id = "";
 let timeframe_list = ['M1','M5','M15','M30','H1','H4','D1','W1','MN'];
 let table_header = `  
     <tr class="table-dark">
@@ -13,7 +18,7 @@ let table_header = `
         <th scope="col" colspan=2>Stochastic</th>
         <th scope="col" colspan=5>Moving Average</th>
         <th scope="col" rowspan=2>Weight</th>
-        <th scope="col" rowspan=2>Order<br>Execution</th>
+        <th scope="col" rowspan=2>Order<br>Execution<br>(Lot ${lot})</th>
     </tr>
     <tr class="table-dark">
         <th style="color:aqua;">Main</th>
@@ -68,9 +73,16 @@ AllPairTrade.changeTimeFrame = async function(tf){
         $(`a[id^='TF_TAB']`).removeClass('active');
         $(`#TF_TAB_${tf}`).css("color", "black");
         $(`#TF_TAB_${tf}`).addClass('active');
+        AllPairTrade.refreshRandomStr();
         AllPairTrade.refreshIndicatorData();
         resolve();
     });
+}
+
+AllPairTrade.refreshRandomStr = function(){
+    let rand = Root.randomStr(10);
+    order_group_id = rand;
+    $('#random_code').text(rand);
 }
 
 AllPairTrade.refreshIndicatorData = function(){
@@ -112,18 +124,19 @@ AllPairTrade.refreshIndicatorData = function(){
                 let html = "";
                 symbol_list.forEach(async function(symbol) {
                     html += `<tr><td scope="row" class="table-dark">${symbol}</td>`;
-                    html += `<td scope="row" class="table-dark" style="font-size:13px;">${symbol_data_list[symbol]['price_bid']}<br>${symbol_data_list[symbol]['price_ask']}</td>`;
+                    html += `<td scope="row" class="table-dark" style="font-size:13px;">${AllPairTrade.getBidAskPrice(symbol)}</td>`;
                     indicator_setting_list.forEach(function(indicator_setting) {
                         html += AllPairTrade.getIndicatorDataFromObj(symbol,indicator_setting);
                     });
                     html += `<td>${AllPairTrade.getWeightProgressBar(symbol)}</td>`;
                     html += `<td>
-                                <button type="button" class="btn btn-success btn-sm">Buy</button>
-                                <button type="button" class="btn btn-danger btn-sm">Sell</button>
+                                <button id="${symbol}_BUY_BTN" type="button" class="btn ${AllPairTrade.getBtnColor(symbol,'BUY')} btn-sm" onclick="AllPairTrade.executeOrder('${symbol}','BUY')">Buy</button>
+                                <button id="${symbol}_SELL_BTN" type="button" class="btn ${AllPairTrade.getBtnColor(symbol,'SELL')} btn-sm" onclick="AllPairTrade.executeOrder('${symbol}','SELL')">Sell</button>
                             </td>`;
                     html += `</tr>`;
                 });
 
+                previous_symbol_data_list = symbol_data_list;
                 $('#indicator_data_tbody').html(html);
             
                 if(is_first_run == true){
@@ -135,6 +148,80 @@ AllPairTrade.refreshIndicatorData = function(){
             }
         }
     });
+}
+
+AllPairTrade.getBtnColor = function(symbol,type){
+    if(type=="BUY"){
+        if(is_already_click_buy_btn[symbol] == true){
+            return 'btn-secondary';
+        }else{
+            return 'btn-success';
+        }
+    }else if(type=="SELL"){
+        if(is_already_click_sell_btn[symbol] == true){
+            return 'btn-secondary';
+        }else{
+            return 'btn-danger';
+        }
+    }
+
+}
+
+AllPairTrade.executeOrder = function(symbol,type){
+    // Send Order To API //
+    $.ajax({
+        type: "post",
+        data: {
+            type,
+            symbol,
+            lot,
+            trade_system : "all_pair_trading",
+            order_id : Root.randomStr(15),
+            order_group_id,
+        },
+        url: BASE_URL + "/api/Order/userExecuteOrder",
+        success: function (response) {
+            if(response.status.code == 200){
+                // Success //
+                Root.showPopupUpRightCorner(`success`,`${type} ${symbol} (Lot 0.01) Success.`)
+                if(type=="BUY"){
+                    $(`#${symbol}_${type}_BTN`).removeClass('btn-success');
+                    $(`#${symbol}_${type}_BTN`).addClass('btn-secondary');
+                    is_already_click_buy_btn[symbol] = true;
+                }else if(type=="SELL"){
+                    $(`#${symbol}_${type}_BTN`).removeClass('btn-danger');
+                    $(`#${symbol}_${type}_BTN`).addClass('btn-secondary');
+                    is_already_click_sell_btn[symbol] = true;
+                }
+            }else{
+                Root.showPopupUpRightCorner(`error`,`userExecuteOrder: ${response.status.description}`)
+            }
+        }
+    });
+    
+}
+
+AllPairTrade.getBidAskPrice = function(symbol){
+    let bid = parseFloat(symbol_data_list[symbol]['price_bid']).toFixed(symbol_data_list[symbol]['digits']);
+    let ask = parseFloat(symbol_data_list[symbol]['price_ask']).toFixed(symbol_data_list[symbol]['digits']);
+    let color_bid = "white";
+    let color_ask = "white";
+    if(is_first_run == false){
+        let prv_bid = parseFloat(previous_symbol_data_list[symbol]['price_bid']).toFixed(previous_symbol_data_list[symbol]['digits']);
+        let prv_ask = parseFloat(previous_symbol_data_list[symbol]['price_ask']).toFixed(previous_symbol_data_list[symbol]['digits']);
+        if(bid>prv_bid){
+            color_bid = "lime";
+        }else if(bid<prv_bid){
+            color_bid = "red";
+        }
+        if(ask>prv_ask){
+            color_ask = "lime";
+        }else if(ask<prv_ask){
+            color_ask = "red";
+        }
+    }
+   
+    return `<font color="${color_bid}">${bid}</font><br><font color="${color_ask}">${ask}</font>`;
 }
 
 AllPairTrade.getWeightProgressBar = function(symbol){
@@ -179,9 +266,9 @@ AllPairTrade.getMADirection = function(symbol, ma_price){
     let previous_price = symbol_data_list[symbol][MA_COMPARE_PRICE]; // Compare With Previous Price
     if(!isNaN(previous_price)){
         let diff_points = Formatter.getDiffPoints(symbol_data_list[symbol]['digits'],previous_price,ma_price);
-        if(ma_price > previous_price){
+        if(ma_price < previous_price){
             return `<td scope="row" style="background:#71FFE0;"><i class="fas fa-arrow-up" style="color:lime"></i> ${diff_points}</td>`;
-        }else if(ma_price < previous_price){
+        }else if(ma_price > previous_price){
             return `<td scope="row" style="background:#FFAE73;"><i class="fas fa-arrow-down" style="color:red;"></i> ${diff_points}</td>`;
         }else{
             return `<td scope="row"  style="background:grey;">${diff_points}</td>`;

@@ -17,21 +17,23 @@ Dashboard.refreshPairData = function(){
             if(response.status.code == 200){
                 let html = "";
                 let updated_time = "";
+                let server_name = "";
                 let date_obj = "";
                 response.data.pair_data.forEach(function(pair) {
                         let today_adr_percent = Math.round((pair.value.today_adr/pair.value.adr_20)*100);
-                        updated_time = pair.updated_at;
+                        updated_time = pair.value.server_time;
+                        server_name = pair.value.server_name;
                         html += `<tr valign="middle">
                                     <td scope="row">${pair.symbol}</td>
                                     <td>${Math.round(pair.value.today_adr)}</td>
                                     <td>${Dashboard.getADRProgressBar(today_adr_percent)}</td>
                                     <td>${Math.round(pair.value.adr_20)}</td>
                                     <td id="${pair.symbol}_price_bid" style="color:${Root.getPriceColor(pair.symbol,'price_bid',pair.value.price_bid)}">
-                                        ${pair.value.price_bid}</td>
+                                        ${parseFloat(pair.value.price_bid).toFixed(pair.value.digits)}</td>
                                     <td id="${pair.symbol}_price_ask" style="color:${Root.getPriceColor(pair.symbol,'price_ask',pair.value.price_ask)}">
-                                        ${pair.value.price_ask}</td>
-                                    <td style="color:${Dashboard.getSwapColor(pair.value.swap_long)}">${pair.value.swap_long}</td>
-                                    <td style="color:${Dashboard.getSwapColor(pair.value.swap_short)}">${pair.value.swap_short}</td>
+                                    ${parseFloat(pair.value.price_ask).toFixed(pair.value.digits)}</td>
+                                    <td style="color:${Dashboard.getSwapColor(pair.value.swap_long)}">${parseFloat(pair.value.swap_long).toFixed(2)}</td>
+                                    <td style="color:${Dashboard.getSwapColor(pair.value.swap_short)}">${parseFloat(pair.value.swap_short).toFixed(2)}</td>
                                     <td>${pair.value.spread}</td>
                                     <td>${Dashboard.getMarketStatus(pair.value.trade_allowed)}</td>
                                     <td>
@@ -42,6 +44,7 @@ Dashboard.refreshPairData = function(){
                 });
                 $('#pair_data_tbody').html(html);
                 date_obj = new Date(Date.parse(updated_time));
+                $('#server_name').html(`Server Name: ${server_name}`);
                 $('#updated_time').html(`Updated Time: ${Root.formatDatetime(date_obj)}`);
                 if(is_first_run==true){
                     $('#dashboard_table').show();
@@ -82,7 +85,7 @@ Dashboard.getSwapColor = function(swap){
 }
 
 Dashboard.getMarketStatus = function(status){
-    if(status == true){
+    if(status == "true"){
         return `<font color="lime">Open</font>`;
     }else{
         return `<font color="red">Close</font>`;

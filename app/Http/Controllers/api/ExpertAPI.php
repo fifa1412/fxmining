@@ -7,6 +7,9 @@ use Exception;
 use App\Models\PairData;
 use App\Models\IndicatorData;
 use App\Models\ActiveOrder;
+use App\Models\RequestOrder;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\APIController;
 use Carbon\Carbon;
 
 /*
@@ -15,6 +18,12 @@ use Carbon\Carbon;
 
 class ExpertAPI extends Controller
 {
+    public function __construct()
+    {
+        APIController::initConst();
+        
+    }
+
     public function systemUpsertPairData(Request $request){
         try{
             $pair_data_list_tmp = json_decode($request->total_params,true);
@@ -80,6 +89,65 @@ class ExpertAPI extends Controller
             return 200;
         }catch (Exception $e) {
             return 500;
+        }
+    }
+
+    public function systemGetRequestOrderList(Request $request){
+        $response_data = array();
+        try {
+            $response_data['order_list'] = RequestOrder::where('status', 'request')->get();
+            if(count($response_data['order_list'])==0){
+                throw new Exception("No request order.", SAFE_EXCEPTION_CODE);
+            }
+            $response_data['count'] = count($response_data['order_list']);
+            return response()->json([
+                'status'  =>  array_merge(APIController::getResponseStatus(HTTP_STATUS_SUCCESS , __CLASS__ , __FUNCTION__),
+                    array('description' => 'Get request order list success.')),
+                'data'    =>  $response_data,
+            ]);
+        }catch (Exception $e) {
+            return response()->json([
+                'status'  =>  array_merge(APIController::getResponseStatus(HTTP_STATUS_FAILED , __CLASS__ , __FUNCTION__),
+                    array('description' => APIController::getResponseDescription($e))),
+                'data'    =>  $response_data,
+            ]);
+        }
+    }
+
+    public function systemUpdateOrderStatus(Request $request)
+    {
+        $response_data = array();
+        try {
+            $total_params = json_decode($request->total_params,true);
+
+            /*$validator = Validator::make(
+                $request->all(),
+                [
+                    "order_id"  => 'required|string',
+                    "status"    => 'required|string',
+                ]
+            ); 
+          
+            if ($validator->fails()) {
+                throw new Exception($validator->errors()->first(), SAFE_EXCEPTION_CODE);
+            }*/
+
+            $affect_row = RequestOrder::where('order_id', $total_params[0]['order_id'])->update(array('status' => $total_params[0]['status']));
+
+            if(!$affect_row>0){
+                throw new Exception("Order id not found.", SAFE_EXCEPTION_CODE);
+            }
+            return response()->json([
+                'status'  =>  array_merge(APIController::getResponseStatus(HTTP_STATUS_SUCCESS , __CLASS__ , __FUNCTION__),
+                    array('description' => 'Update order status success.')),
+                'data'    =>  $response_data,
+            ]);
+        }catch (Exception $e) {
+            return response()->json([
+                'status'  =>  array_merge(APIController::getResponseStatus(HTTP_STATUS_FAILED , __CLASS__ , __FUNCTION__),
+                    array('description' => APIController::getResponseDescription($e))),
+                'data'    =>  $response_data,
+            ]);
         }
     }
 }
