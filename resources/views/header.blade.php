@@ -8,6 +8,9 @@
 <script type="text/javascript" src="{{ asset('js/global_variable.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/root.js') }}"></script>
 
+<link rel="stylesheet" href="{{ asset('js/libs/notific.css')}}"/>
+<script src="{{ asset('js/libs/notific.js')}}"></script>
+
 <head>
     <title>FX Mining</title>
     <link rel="icon" href="{{asset('images/logo.png')}}">
@@ -32,6 +35,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="{{url('dashboard')}}">Currency Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{url('active_order')}}">Order Management</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{url('active_group_order')}}">Order Group Management</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{url('strategies/all_pair_trade')}}">หว่านแห Order</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{url('adr')}}">Average Daily Range</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{url('database')}}">Database Status</a></li>

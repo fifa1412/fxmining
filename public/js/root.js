@@ -10,6 +10,13 @@ Root.showPopup = function(text){
 	Swal.showLoading();
 }
 
+Root.showPopupUpRightCorner = function(status, text){
+    Message.add(text, {
+        type: status,
+        life: 5000
+    });
+}
+
 Root.formatDatetime = function(date_obj){
     let month = (date_obj.getMonth() > 9) ? date_obj.getMonth() : ('0' + date_obj.getMonth());
     let day = (date_obj.getDate() > 9) ? date_obj.getDate() : ('0' + date_obj.getDate());
@@ -21,6 +28,16 @@ Root.formatDatetime = function(date_obj){
 
 Root.closePopup = function(){
 	Swal.close();
+}
+
+Root.randomStr = function(length){
+    let result           = '';
+    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    for(let i=0; i<length; i++) {
+        result += characters.charAt(Math.floor(Math.random()*charactersLength));
+    }
+    return result;
 }
 
 Root.showWarningWithRedirect = function(text, url){
