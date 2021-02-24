@@ -20,7 +20,7 @@ ActiveOrder.refreshActiveOrder = function(){
                 response.data.active_order.forEach(function(active_order) {
                         html += `<tr style="color:${ActiveOrder.getRowFontColor(active_order.value.profit)};">
                                     <th scope="row">${active_order.ticket}</th>
-                                    <th scope="row">${ActiveOrder.getOrderType(active_order.value.type)}</th>
+                                    <th scope="row">${Root.getOrderType(active_order.value.type)}</th>
                                     <th scope="row">${active_order.value.lot}</th>
                                     <th scope="row">${active_order.value.symbol}</th>
                                     <th scope="row">${parseFloat(active_order.value.open_price).toFixed(5)}</th>
@@ -51,7 +51,7 @@ ActiveOrder.refreshActiveOrder = function(){
 
 ActiveOrder.getSwap = function(swap){
     if(swap!=0){
-        return swap;
+        return parseFloat(swap).toFixed(2);
     }else{
         return "-";
     }
@@ -78,15 +78,5 @@ ActiveOrder.getRowFontColor = function(profit){
         return "lime";
     }else{
         return "red";
-    }
-}
-
-ActiveOrder.getOrderType = function (type){
-    if(type==0){
-        return "Buy";
-    }else if(type==1){
-        return "Sell";
-    }else{
-        return "Unknown";
     }
 }

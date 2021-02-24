@@ -65,3 +65,13 @@ Root.getPriceColor = function(pair,price_type,current_price){
         }
     }
 }
+
+Root.getOrderType = function (type){
+    if(type==0){
+        return "Buy";
+    }else if(type==1){
+        return "Sell";
+    }else{
+        return "Unknown";
+    }
+}

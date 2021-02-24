@@ -80,7 +80,7 @@ AllPairTrade.changeTimeFrame = async function(tf){
 }
 
 AllPairTrade.refreshRandomStr = function(){
-    let rand = Root.randomStr(10);
+    let rand = Root.randomStr(4);
     order_group_id = rand;
     $('#random_code').text(rand);
 }
@@ -176,7 +176,7 @@ AllPairTrade.executeOrder = function(symbol,type){
             symbol,
             lot,
             trade_system : "all_pair_trading",
-            order_id : Root.randomStr(15),
+            order_id : Root.randomStr(5),
             order_group_id,
         },
         url: BASE_URL + "/api/Order/userExecuteOrder",

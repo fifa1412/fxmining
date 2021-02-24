@@ -29,6 +29,7 @@ Route::group(
         Route::post('Dashboard/userGetPairData', 'DashboardAPI@userGetPairData');
         Route::post('Dashboard/userGetIndicatorData', 'DashboardAPI@userGetIndicatorData');
         Route::post('Dashboard/userGetActiveOrder', 'DashboardAPI@userGetActiveOrder');
+        Route::post('Dashboard/userGetActiveGroupOrder', 'DashboardAPI@userGetActiveGroupOrder');
 
         Route::post('Order/userExecuteOrder', 'OrderAPI@userExecuteOrder');
     }
