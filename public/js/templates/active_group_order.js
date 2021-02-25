@@ -17,7 +17,7 @@ ActiveGroupOrder.refreshActiveGroupOrder = function(){
             if(response.status.code == 200){
                 let html = "";
                 let group_id_list = response.data.order_group_id_list;
-                if(group_id_list.length>0){
+                //if(group_id_list.length>0){
                     group_id_list.forEach(function(group_id) {
 
                         // Create Group Table //
@@ -72,13 +72,28 @@ ActiveGroupOrder.refreshActiveGroupOrder = function(){
                     }
 
                     $(`#main_container`).html(html);
-                }
+                //}
             }
         }
     });
 }
 
-ActiveGroupOrder.closeGroupOrder = function(group_id){
+ActiveGroupOrder.closeGroupOrder = function(order_group_id){
+
+    $.ajax({
+        type: "post",
+        data:{
+            order_group_id
+        },
+        url: BASE_URL + "/api/Order/userRequestCloseOrderGroup",
+        success: function (response) {
+            if(response.status.code == 200){
+                Root.showPopupUpRightCorner(`success`,`Close Order Group ID (${order_group_id}) Success.`)
+            }else{
+                Root.showPopupUpRightCorner(`error`,`userRequestCloseOrderGroup: ${response.status.description}`)
+            }
+        }
+    });
 
 }
 

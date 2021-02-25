@@ -95,7 +95,7 @@ class ExpertAPI extends Controller
     public function systemGetRequestOrderList(Request $request){
         $response_data = array();
         try {
-            $response_data['order_list'] = RequestOrder::where('status', 'request')->get();
+            $response_data['order_list'] = RequestOrder::whereIn('status', ['request_open','request_close'])->get();
             if(count($response_data['order_list'])==0){
                 throw new Exception("No request order.", SAFE_EXCEPTION_CODE);
             }
@@ -132,7 +132,11 @@ class ExpertAPI extends Controller
                 throw new Exception($validator->errors()->first(), SAFE_EXCEPTION_CODE);
             }*/
 
-            $affect_row = RequestOrder::where('order_id', $total_params[0]['order_id'])->update(array('status' => $total_params[0]['status']));
+            $affect_row = RequestOrder::where('order_id', $total_params[0]['order_id'])
+                ->update(array(
+                    'status' => $total_params[0]['status'],
+                    'order_ticket' => $total_params[0]['order_ticket'],
+                ));
 
             if(!$affect_row>0){
                 throw new Exception("Order id not found.", SAFE_EXCEPTION_CODE);

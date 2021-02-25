@@ -32,5 +32,7 @@ Route::group(
         Route::post('Dashboard/userGetActiveGroupOrder', 'DashboardAPI@userGetActiveGroupOrder');
 
         Route::post('Order/userExecuteOrder', 'OrderAPI@userExecuteOrder');
+        Route::post('Order/userRequestCloseOrderGroup', 'OrderAPI@userRequestCloseOrderGroup');
+        
     }
 );
