@@ -19,6 +19,10 @@ class APIController extends Controller
         ));
         define('SAFE_EXCEPTION_CODE', 99);
     }
+    
+    public static function getConfig($cfg_name){
+        return config('config-dev.'.$cfg_name);
+    }
 
     public static function getResponseStatus($status,$class,$method){
         return array(
