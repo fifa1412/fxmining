@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Exception;
 use App\Models\RequestOrder;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\system\Notification;
 
 class OrderAPI extends Controller
 {
@@ -37,6 +38,7 @@ class OrderAPI extends Controller
                 throw new Exception($validator->errors()->first(), SAFE_EXCEPTION_CODE);
             }
 
+            Notification::sendNotification(null, 'New Order Execute: '.$request->symbol.' Lot: '.$request->lot);
             RequestOrder::insert(array_merge($validator->validated(),['status'=>'request_open']));
 
             return response()->json([

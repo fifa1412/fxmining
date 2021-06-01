@@ -33,11 +33,18 @@ ActiveOrder.refreshActiveOrder = function(){
                         total_profit += parseFloat(active_order.value.profit);
                 });
 
-                // Summary Profit //
-                html += `<tr class="${ActiveOrder.getRowBgColor(total_profit)}">
-                            <th scope="row" colspan=9>Total Profit</th>
-                            <th scope="row">${parseFloat(total_profit).toFixed(2)}</th>
-                        </tr> `;
+                if(html == ``){
+                    html += `<tr style="color:white">
+                        <td style="text-align:center" colspan=10>No Active Order</td>
+                    </tr>`;
+                }else{
+                    // Summary Profit //
+                    html += `<tr class="${ActiveOrder.getRowBgColor(total_profit)}">
+                        <th scope="row" colspan=9>Total Profit</th>
+                        <th scope="row">${parseFloat(total_profit).toFixed(2)}</th>
+                    </tr> `;
+                }
+                
                 $('#active_order_tbody').html(html);
 
                 if(is_first_run == true){

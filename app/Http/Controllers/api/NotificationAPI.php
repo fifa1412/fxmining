@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\APIController;
+use App\Http\Controllers\system\Notification;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -33,27 +34,9 @@ class NotificationAPI extends Controller
             if($token == ""){
                 throw new Exception('Token id not found.', SAFE_EXCEPTION_CODE);
             }
+            $message = $request->message;
 
-            $url        = APIController::getConfig('LINE_NOTIFY_SERVER');
-            $headers    = [
-                            'Content-Type: application/x-www-form-urlencoded',
-                            'Authorization: Bearer '.$token
-                        ];
-            $fields     = 'message='.$request->message;
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            $result = curl_exec($ch);
-            curl_close($ch);
-            $result = json_decode($result,TRUE);
-
-            if($result['status']!=200){
-                throw new Exception('Send line notify unsuccessfully.', SAFE_EXCEPTION_CODE);
-            }
+            Notification::sendNotification($token, $message);
 
             return response()->json([
                 'status'  =>  array_merge(APIController::getResponseStatus(HTTP_STATUS_SUCCESS , __CLASS__ , __FUNCTION__),

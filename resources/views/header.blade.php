@@ -20,6 +20,18 @@
     .cursor-pointer{
         cursor: pointer;
     }
+    .progress {
+        position: relative;
+    }
+    .progress-bar-title {
+        position: absolute;
+        text-align: center;
+        overflow: hidden;
+        color: #fff;
+        right: 0;
+        left: 0;
+        top: 0;
+    }
 </style>
 
 <!-- Navbar Content -->

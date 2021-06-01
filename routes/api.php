@@ -34,6 +34,6 @@ Route::group(
         Route::post('Order/userExecuteOrder', 'OrderAPI@userExecuteOrder');
         Route::post('Order/userRequestCloseOrderGroup', 'OrderAPI@userRequestCloseOrderGroup');
 
-        Route::post('NotificationAPI/systemSendLineNotify', 'NotificationAPI@systemSendLineNotify');
+        Route::post('Notification/systemSendLineNotify', 'NotificationAPI@systemSendLineNotify');
     }
 );
