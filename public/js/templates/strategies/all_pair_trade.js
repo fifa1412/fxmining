@@ -412,7 +412,7 @@ AllPairTrade.getIndicatorDataFromObj = function(symbol,request_settings){
                     let key = `${symbol}_${timeframe}_${request_settings.indicator_name}_${val}`;
                     temp_data_for_cal_weight[key] = indicator_value;
         }
-        
+
     });
     if(isNaN(indicator_value)){
         return `<th scope="row" style="background:grey">${indicator_value}</th>`;
@@ -428,10 +428,18 @@ AllPairTrade.getIndicatorCellStyle = function(request_settings, indicator_value,
     }else{
         return_with_fixed = indicator_value;
     }
+    
+    // add black border between indicator cell //
+    let border = ``;
+    if((request_settings.indicator_name == 'STOCHASTIC' && request_settings.value == 'mode_signal') ||
+    (request_settings.indicator_name == 'CCI' && request_settings.value == 'main_value') || 
+    (request_settings.indicator_name == 'ADX' && request_settings.value == 'mode_minusdi')  ){
+        border = `border-right: 4px solid black;`;
+    }
     if(request_settings.indicator_name == "MA"){
         return  `${AllPairTrade.getMADirection(symbol,return_with_fixed)}`;
     }else{
-        return  `<td scope="row" style="background:${Formatter.getIndicatorColor(request_settings,indicator_value)}">${return_with_fixed}</td>`;
+        return  `<td scope="row" style="${border} background:${Formatter.getIndicatorColor(request_settings,indicator_value)}">${return_with_fixed}</td>`;
     }
 }
 
