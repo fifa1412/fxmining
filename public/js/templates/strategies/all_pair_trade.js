@@ -7,7 +7,7 @@ let previous_symbol_data_list = [];
 let is_already_click_buy_btn = [];
 let is_already_click_sell_btn = [];
 let symbol_data_list = [];
-let lot = 0.01;
+let default_lot = 0.01; // Default Lot
 let order_group_id = "";
 let timeframe_list = ['M1','M5','M15','M30','H1','H4','D1','W1','MN'];
 let table_header = `  
@@ -19,7 +19,7 @@ let table_header = `
         <th scope="col" colspan=2>Stochastic</th>
         <th scope="col" colspan=5>Moving Average</th>
         <th scope="col" rowspan=2>Weight</th>
-        <th scope="col" rowspan=2>Order<br>Execution<br>(Lot ${lot})</th>
+        <th scope="col" colspan=2>Order Lot</th>
     </tr>
     <tr class="table-dark">
         <th style="color:aqua;">Main</th>
@@ -32,6 +32,7 @@ let table_header = `
         <th>SMA50</th>
         <th>SMA100</th>
         <th>SMA200</th>
+        <th><input type="number" id="lot_input" class="form-control" style="width: 90px" value="${default_lot}"></th>
     </tr>
 `;
 let indicator_setting_list = [
@@ -170,6 +171,7 @@ AllPairTrade.getBtnColor = function(symbol,type){
 
 AllPairTrade.executeOrder = function(symbol,type){
     // Send Order To API //
+    let lot = document.getElementById('lot_input').value;
     $.ajax({
         type: "post",
         data: {
@@ -184,7 +186,7 @@ AllPairTrade.executeOrder = function(symbol,type){
         success: function (response) {
             if(response.status.code == 200){
                 // Success //
-                Root.showPopupUpRightCorner(`success`,`${type} ${symbol} (Lot 0.01) Success.`)
+                Root.showPopupUpRightCorner(`success`,`${type} ${symbol} (Lot ${lot}) Success.`)
                 if(type=="BUY"){
                     $(`#${symbol}_${type}_BTN`).removeClass('btn-success');
                     $(`#${symbol}_${type}_BTN`).addClass('btn-secondary');
