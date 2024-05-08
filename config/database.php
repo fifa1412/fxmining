@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'local_mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,13 +43,25 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'mysql' => [
+        'local_mysql' => [
             'driver'    => 'mysql',
-            'host'      => '45.154.24.224',
-            'port'      => '3306',
-            'database'  => 'fxmining',
-            'username'  => 'root', 
-            'password' => 'pkOne#713',
+            'host'      => env('LOCAL_DB_HOST', '127.0.0.1'),
+            'port'      => env('LOCAL_DB_PORT', '3306'),
+            'database'  => env('LOCAL_DB_DATABASE', ''),
+            'username'  => env('LOCAL_DB_USERNAME', ''),
+            'password'  => env('LOCAL_DB_PASSWORD', ''),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ],
+
+        'remote_mysql' => [
+            'driver'    => 'mysql',
+            'host'      => env('REMOTE_DB_HOST', '127.0.0.1'),
+            'port'      => env('REMOTE_DB_PORT', '3306'),
+            'database'  => env('REMOTE_DB_DATABASE', ''),
+            'username'  => env('REMOTE_DB_USERNAME', ''),
+            'password'  => env('REMOTE_DB_PASSWORD', ''),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
