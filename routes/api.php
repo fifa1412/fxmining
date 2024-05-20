@@ -27,9 +27,9 @@ Route::group(
         Route::post('Expert/systemGetRequestOrderList', 'ExpertAPI@systemGetRequestOrderList');
         
         Route::post('Dashboard/userGetPairData', 'DashboardAPI@userGetPairData');
-        Route::post('Dashboard/userGetIndicatorData', 'DashboardAPI@userGetIndicatorData');
-        Route::post('Dashboard/userGetActiveOrder', 'DashboardAPI@userGetActiveOrder');
-        Route::post('Dashboard/userGetActiveGroupOrder', 'DashboardAPI@userGetActiveGroupOrder');
+        Route::get('Dashboard/userGetIndicatorData', 'DashboardAPI@userGetIndicatorData');
+        Route::get('Dashboard/userGetActiveOrder', 'DashboardAPI@userGetActiveOrder');
+        Route::get('Dashboard/userGetActiveGroupOrder', 'DashboardAPI@userGetActiveGroupOrder');
 
         Route::post('Order/userExecuteOrder', 'OrderAPI@userExecuteOrder');
         Route::post('Order/userRequestCloseOrderGroup', 'OrderAPI@userRequestCloseOrderGroup');

@@ -7,7 +7,10 @@ let previous_symbol_data_list = [];
 let is_already_click_buy_btn = [];
 let is_already_click_sell_btn = [];
 let symbol_data_list = [];
+
 let default_lot = 0.01; // Default Lot
+let refresh_data_sec = 5 * 1000;
+
 let order_group_id = "";
 let timeframe_list = ['M1','M5','M15','M30','H1','H4','D1','W1','MN'];
 let table_header = `  
@@ -19,6 +22,7 @@ let table_header = `
         <th scope="col" colspan=2>Stochastic</th>
         <th scope="col" colspan=5>Moving Average</th>
         <th scope="col" rowspan=2>Weight</th>
+        <th scope="col" rowspan=2>Trend</th>
         <th scope="col" colspan=2>Order Lot</th>
     </tr>
     <tr class="table-dark">
@@ -56,7 +60,7 @@ $(document).ready(async function() {
 
 setInterval(function(){ 
     AllPairTrade.refreshIndicatorData();
-}, 5000);
+}, refresh_data_sec);
 
 AllPairTrade.generateTimeframeTab = function(){
     let timeframe_tab_html = '';
@@ -89,7 +93,7 @@ AllPairTrade.refreshRandomStr = function(){
 
 AllPairTrade.refreshIndicatorData = function(){
     $.ajax({
-        type: "post",
+        type: "get",
         url: BASE_URL + "/api/Dashboard/userGetIndicatorData",
         data:{
             timeframe
@@ -131,6 +135,7 @@ AllPairTrade.refreshIndicatorData = function(){
                         html += AllPairTrade.getIndicatorDataFromObj(symbol,indicator_setting);
                     });
                     html += `<td>${AllPairTrade.getWeightProgressBar(symbol)}</td>`;
+                    html += `<td>${AllPairTrade.getTrendStatus(symbol)}</td>`;
                     html += `<td>
                                 <button id="${symbol}_BUY_BTN" type="button" class="btn ${AllPairTrade.getBtnColor(symbol,'BUY')} btn-sm" onclick="AllPairTrade.executeOrder('${symbol}','BUY')">Buy</button>
                                 <button id="${symbol}_SELL_BTN" type="button" class="btn ${AllPairTrade.getBtnColor(symbol,'SELL')} btn-sm" onclick="AllPairTrade.executeOrder('${symbol}','SELL')">Sell</button>
@@ -204,7 +209,7 @@ AllPairTrade.executeOrder = function(symbol,type){
     
 }
 
-AllPairTrade.getBidAskPrice = function(symbol){
+AllPairTrade.getBidAskPrice = function(symbol, with_style = true){
     let bid = parseFloat(symbol_data_list[symbol]['price_bid']).toFixed(symbol_data_list[symbol]['digits']);
     let ask = parseFloat(symbol_data_list[symbol]['price_ask']).toFixed(symbol_data_list[symbol]['digits']);
     let color_bid = "white";
@@ -223,8 +228,79 @@ AllPairTrade.getBidAskPrice = function(symbol){
             color_ask = "red";
         }
     }
-   
-    return `<font color="${color_bid}">${bid}</font><br><font color="${color_ask}">${ask}</font>`;
+
+    if(with_style == true){
+        return `<font color="${color_bid}">${bid}</font><br><font color="${color_ask}">${ask}</font>`;
+    }else{
+        return bid; // Default Return Value == BID //
+    }
+}
+
+AllPairTrade.getStochZoneAndDirection = function(stoch_main, stoch_signal){
+    let return_data = {
+        'zone': 0,
+        'direction': 'UNKNOWN'
+    }
+    if(stoch_signal >= 90){
+        return_data.zone = -2;
+    }else if(stoch_signal >= 75){
+        return_data.zone = -1;
+    }else if(stoch_signal >= 50){
+        return_data.zone = -0.5;
+    }else if(stoch_signal >= 25){
+        return_data.zone = 0.5;
+    }else if(stoch_signal >= 10){
+        return_data.zone = 1;
+    }else if(stoch_signal >= 0){
+        return_data.zone = 2;
+    }
+    if(stoch_main > stoch_signal){
+        return_data.direction = 'UP'
+    }else{
+        return_data.direction = 'DOWN'
+    }
+
+    return return_data;
+}
+
+AllPairTrade.getTrendStatus = function(symbol){
+    let summary_text = `<font color="white">UNKNOWN</font>`;
+    let current_price = AllPairTrade.getBidAskPrice(symbol, false);
+
+    // 1. Get EMA200 => Main Trend //
+    let ema200trend = '';
+    let ema200 = AllPairTrade.getIndicatorDataFromObj(symbol, {'indicator_name' : 'MA','indicator_settings' : {'period':'200','apply_to':'PRICE_CLOSE','method':'MODE_SMA'},'value' : 'main_value','decimal':null}, false);
+    if(current_price > ema200){
+        ema200trend = `UP`
+    }else{
+        ema200trend = `DOWN`
+    }   
+
+    // 2. Check Stochastic Zone //
+    let stoch_main = AllPairTrade.getIndicatorDataFromObj(symbol, {'indicator_name' : 'STOCHASTIC','indicator_settings' : {'k_period':'5','d_period':'3','slowing':'3','price_field':'LOW_HIGH','method':'MODE_SMA'},'value' : 'mode_main','decimal':'2'}, false);
+    let stoch_signal = AllPairTrade.getIndicatorDataFromObj(symbol, {'indicator_name' : 'STOCHASTIC','indicator_settings' : {'k_period':'5','d_period':'3','slowing':'3','price_field':'LOW_HIGH','method':'MODE_SMA'},'value' : 'mode_signal','decimal':'2'}, false);
+    let stoch_data = AllPairTrade.getStochZoneAndDirection(stoch_main, stoch_signal);
+
+    // 3. Check ADX Zone (Implement Later) //
+
+    // Summarize Data //
+    if(ema200trend == stoch_data.direction){
+        if([-2,2].includes(stoch_data.zone)){
+            summary_text = `<font color="lime">STRONG FOLLOW</font>`;
+        }else if([-1,1].includes(stoch_data.zone)){
+            summary_text = `<font color="green">FOLLOW</font>`;
+        }else{
+            summary_text = `<font color="yellow">SIDEWAY</font>`;
+        }
+    }else{
+        summary_text = `<font color="red">RETRACE</font>`;
+    }
+
+    return summary_text;
+    
+    // If 1=2=3 => STRONG FOLLOW //
+    // If 1=3 & 1!=2 => FOLLOW //
+    // If 1!=2!=3 => RETRACE (Not Safe For Trade) //
 }
 
 AllPairTrade.getWeightProgressBar = function(symbol){
@@ -397,7 +473,7 @@ AllPairTrade.getWeightProgressBar = function(symbol){
     </div>`;
 }
 
-AllPairTrade.getIndicatorDataFromObj = function(symbol,request_settings){
+AllPairTrade.getIndicatorDataFromObj = function(symbol,request_settings, with_style = true){
     let indicator_value = "-";
     indicator_data_list.forEach(function(indicator_data) {
         if(indicator_data.symbol == symbol
@@ -416,6 +492,11 @@ AllPairTrade.getIndicatorDataFromObj = function(symbol,request_settings){
         }
 
     });
+
+    if(with_style == false){
+        return indicator_value;
+    }
+
     if(isNaN(indicator_value)){
         return `<th scope="row" style="background:grey">${indicator_value}</th>`;
     }else{

@@ -11,7 +11,7 @@ setInterval(function(){
 
 ActiveOrder.refreshActiveOrder = function(){
     $.ajax({
-        type: "post",
+        type: "get",
         url: BASE_URL + "/api/Dashboard/userGetActiveOrder",
         success: function (response) {
             if(response.status.code == 200){

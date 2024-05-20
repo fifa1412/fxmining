@@ -11,20 +11,19 @@ setInterval(function(){
 
 ActiveGroupOrder.refreshActiveGroupOrder = function(){
     $.ajax({
-        type: "post",
+        type: "get",
         url: BASE_URL + "/api/Dashboard/userGetActiveGroupOrder",
         success: function (response) {
             if(response.status.code == 200){
                 let html = "";
                 let group_id_list = response.data.order_group_id_list;
-                //if(group_id_list.length>0){
+                if(group_id_list.length>0){
                     group_id_list.forEach(function(group_id) {
 
                         // Create Group Table //
-                        html += ActiveGroupOrder.writeTableHeader(group_id);
-                        html += `<tbody>`;
                         let order_list = response.data.order_list[group_id];
-
+                        html += ActiveGroupOrder.writeTableHeader(group_id, "DURATION", "TIME");
+                        html += `<tbody>`;
                         let footer_value = [];
                             footer_value['total_lot'] = 0;
                             footer_value['total_swap'] = 0;
@@ -72,7 +71,29 @@ ActiveGroupOrder.refreshActiveGroupOrder = function(){
                     }
 
                     $(`#main_container`).html(html);
-                //}
+                }else{
+                    // No Active Group Order //
+                    let footer_value = {
+                        'total_lot': 0,
+                        'count_win': 0,
+                        'count_lose': 0,
+                        'total_swap': 0.00,
+                        'total_profit': 0.00
+                    }
+                    html += ActiveGroupOrder.writeTableHeader(`-`,`-`,`-`);
+                    html += `<tbody>`;
+                    html += `<tr style="color: white;">
+                                <td style="text-align:center" colspan="12">No Active Group Order</td>
+                            </tr>`
+                    html += `</tbody>`;
+                    html += ActiveGroupOrder.writeTableFooter(`-`,footer_value);
+                    $(`#main_container`).html(html);
+
+                    if(is_first_run == true){
+                        is_first_run = false;
+                        Root.closePopup();
+                    }
+                }
             }
         }
     });
@@ -97,14 +118,14 @@ ActiveGroupOrder.closeGroupOrder = function(order_group_id){
 
 }
 
-ActiveGroupOrder.writeTableHeader = function(group_id){
-    return `<div class="div-scroll" style="overflow:hidden;">
+ActiveGroupOrder.writeTableHeader = function(group_id, duration, open_time){
+    let content = `<div class="div-scroll" style="overflow:hidden;">
     <table class="table" style="display: block; overflow-y: scroll; margin-right: -30px;">
         <thead>
             <tr style="color:yellow;">
                 <th style="width:300px">Order Group Id : <a id="group_id_${group_id}">${group_id}</a></th>
-                <th style="width:200px">Duration : <a id="duration_${group_id}">-</a></th>
-                <th style="width:400px">Open Time : <a id="open_time_${group_id}">-</a></th>
+                <th style="width:200px">Duration : <a id="duration_${group_id}">${duration}</a></th>
+                <th style="width:400px">Open Time : <a id="open_time_${group_id}">${open_time}</a></th>
                 <th style="width:300px"></th>
             </tr>
         </thead>
@@ -122,10 +143,14 @@ ActiveGroupOrder.writeTableHeader = function(group_id){
                 <th style="width:100px">TP</th>
                 <th style="width:100px">SL</th>
                 <th style="width:100px">Swap</th>
-                <th style="width:100px">Profit</th>
-                <th style="width:100px;text-align:center"><button type="button" class="btn btn-danger" style="line-height:1;font-size:12px;" onclick="ActiveGroupOrder.closeGroupOrder('${group_id}')">Close All</button></th>
-            </tr>
-        </thead>`;
+                <th style="width:100px">Profit</th>`
+    if(group_id == "-"){
+        content += `<th style="width:100px;text-align:center"></th>`
+    }else{
+        content += `<th style="width:100px;text-align:center"><button type="button" class="btn btn-danger" style="line-height:1;font-size:12px;" onclick="ActiveGroupOrder.closeGroupOrder('${group_id}')">Close All</button></th>`
+    }
+    content += `</tr></thead>`;
+    return content;
 }
 
 ActiveGroupOrder.writeTableFooter = function(group_id,footer_value){

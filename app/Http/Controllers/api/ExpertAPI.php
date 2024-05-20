@@ -31,8 +31,7 @@ class ExpertAPI extends Controller
             foreach($pair_data_list_tmp as $pair_data){
                 $pair_data_list[] = array(
                     'symbol' => $pair_data['symbol'],
-                    'value' => $pair_data['value'],
-                    'updated_at'=> Carbon::now()->toIso8601String(),
+                    'value' => json_encode($pair_data['value'])
                 );
             }
             PairData::truncate();
@@ -50,11 +49,11 @@ class ExpertAPI extends Controller
             foreach($ind_data_list_tmp as $ind_data){
                 $ind_data_list[] = array(
                     'indicator_name' => $ind_data['indicator_name'],
-                    'indicator_settings' => $ind_data['indicator_settings'],
+                    'indicator_settings' => json_encode($ind_data['indicator_settings']),
                     'symbol' => $ind_data['symbol'],
                     'timeframe' => $ind_data['timeframe'],
-                    'value' => $ind_data['value'],
-                    'updated_at'=> Carbon::now()->toIso8601String(),
+                    'value' => json_encode($ind_data['value']),
+                    //'updated_at'=> Carbon::now()->toIso8601String(),
                 );
                 /* ยกเลิกการ upsert เพราะมันช้า
                 IndicatorData::updateOrCreate([
@@ -80,8 +79,7 @@ class ExpertAPI extends Controller
             foreach($active_order_list_tmp as $active_order){
                 $active_order_list[] = array(
                     'ticket' => $active_order['ticket'],
-                    'value' => $active_order['value'],
-                    'updated_at'=> Carbon::now()->toIso8601String(),
+                    'value' => json_encode($active_order['value'])
                 );
             }
             ActiveOrder::truncate();
